@@ -1,11 +1,15 @@
 #include "../api.h"
 
-#include <windows.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#define Sleep(ms) usleep(1000*ms)	
+#endif
 
 
 typedef struct gpio_dev{
@@ -17,7 +21,7 @@ static ELF_API void println(const char* msg){
     printf("%s\n", msg);
 }
 
-static ELF_API void sleep(int ms){
+static ELF_API void delay(int ms){
     Sleep(ms);
 }
 
@@ -36,7 +40,7 @@ static ELF_API void gpio_set(void* pdev, int v){
 
 const runtime_api api_ = {
     println,
-    sleep,
+    delay,
     device_get,
     gpio_set
 };

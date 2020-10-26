@@ -11,7 +11,7 @@
 
 typedef struct runtime_api{
 	ELF_API void (*println)(const char* msg);
-	ELF_API void (*sleep)(int ms);
+	ELF_API void (*delay)(int ms);
 	ELF_API void* (*device_get)(const char* name);
 	ELF_API void (*gpio_set)(void* dev, int v);
 }runtime_api;

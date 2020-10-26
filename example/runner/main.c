@@ -15,18 +15,31 @@ void vmem_free(void* mem) {
 	VirtualFree(mem, 0, MEM_RELEASE);
 }
 #else
+#include <malloc.h>
 #include <sys/mman.h>
-void* vmem_alloc(size_t sz) {
-	void* ptr = NULL;
-    size_t len = posix_memalign(&ptr, 0x200000, sz);
+
+void* vmem_alloc_once(size_t sz) {	
+	void* ptr = memalign(0x200000, sz);    
 	if(ptr){
-		if(mprotect(ptr, len, PROT_READ|PROT_WRITE|PROT_EXEC)<0){
+		if(mprotect(ptr, 0x200000, PROT_READ|PROT_WRITE|PROT_EXEC)<0){
+			//printf("mprotect error %p\n", ptr);
 			free(ptr);
 			return NULL;
 		}
 	}
     return ptr;
 }
+
+void* vmem_alloc(size_t sz){
+	int i;
+	void* ret;
+	for(i=0;i<50;i++){
+		ret = vmem_alloc_once(sz);	
+		if(ret)return ret;
+	}
+	return NULL;
+}
+
 void vmem_free(void* mem) {
 	free(mem);
 }
@@ -102,7 +115,7 @@ int main(){
         printf("load error\n");
         return 1;
     }
-
+	printf("load ok\n");
     app_entry_func func = elf_module_sym(mod, "app");
     if(!func){
         printf("sym not found\n");

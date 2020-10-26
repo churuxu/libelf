@@ -20,7 +20,7 @@ int app(const runtime_api* api){
 		state_ = !state_;
 		api->println("[APP] tick");		
 		api->gpio_set(dev_, state_);
-		api->sleep(500);
+		api->delay(500);
 	}
 	return 0;
 }
